@@ -30,6 +30,7 @@ class DataIngestion:
             self.mongo_client = pymongo.MongoClient(MONGO_DB_URL)
             collection = self.mongo_client[database_name][collection_name]
             df = pd.DataFrame(list(collection.find()))
+            print(f"Rows and columns in dataframe: {df.shape}"  )
             if "_id" in df.columns:
                 df = df.drop("_id", axis=1)
             df.replace("na", np.nan, inplace=True)
@@ -37,7 +38,26 @@ class DataIngestion:
 
         except Exception as e:
             raise NetworkSecurityException(e, sys)
-        
+    def split_data_as_train_test(self,dataframe: pd.DataFrame):
+
+        try:
+            train_set,test_set = train_test_split(
+                dataframe, test_size=self.data_ingestion_config.train_test_split_ratio)
+            logging.info("Performed train test split on the data")
+            logging.info("Exited the split_data_as_train_test method of DataIngestion class")
+
+            dir_path = os.path.dirname(self.data_ingestion_config.training_file_path)
+            os.makedirs(dir_path, exist_ok=True)
+            logging.info("Exporting training datset to file")
+            dir_path = os.path.dirname(self.data_ingestion_config.training_file_path)
+            os.makedirs(dir_path, exist_ok=True)
+            train_set.to_csv(self.data_ingestion_config.training_file_path, index=False, header=True)
+            logging.info("Exporting test datset to file")
+            test_set.to_csv(self.data_ingestion_config.testing_file_path, index=False, header=True)
+            logging.info("Exported train and test dataset to file")
+
+        except Exception as e:
+            raise NetworkSecurityException(e, sys)
     def export_data_into_feature_store(self,dataframe: pd.DataFrame):
         try:
             feature_store_file_path = self.data_ingestion_config.feature_store_file_path
@@ -54,8 +74,8 @@ class DataIngestion:
             dataframe = self.export_collection_as_dataframe()
             dataframe = self.export_data_into_feature_store(dataframe)
             self.split_data_as_train_test(dataframe)
-            dataingestionartifact = DataIngestionArtifact(trained_file_path=self.data_ingestion_config.train_file_path,
-                                                        test_file_path=self.data_ingestion_config.test_file_path)
+            dataingestionartifact = DataIngestionArtifact(train_file_path=self.data_ingestion_config.training_file_path,
+                                                        test_file_path=self.data_ingestion_config.testing_file_path)
 
             return dataingestionartifact
         except Exception as e:
