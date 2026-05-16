@@ -3,7 +3,7 @@ import sys
 import pandas as pd
 import numpy as np
 
-TARGET_COLUMN = "RESULT"
+TARGET_COLUMN = "Result"
 PIPELINE_NAME: str = "network_security"
 ARTIFACT_DIR: str = "Arifacts"
 FILE_NAME: str = "phisingData.csv"
@@ -27,3 +27,14 @@ DATA_VALIDATION_DRIFT_REPORT_DIR: str = "drift_report"
 DATA_VALIDATION_DRIFT_REPORT_FILE_NAME: str = "report.yaml"
 
 
+DATA_TRANSFORMATION_DIR_NAME: str = "data_transformation"
+DATA_TRANSFORMATION_TRANSFORMED_DATA_DIR: str = "transformed"
+DATA_TRANSFORMATION_TRANSFORMED_OBJECT_DIR: str = "transformed_object"
+
+## KNN imputer to replace nan values
+DATA_TRANSFORMATION_INPUTER_PARAMS:dict={
+    "missing_values":np.nan,
+    "n_neighbors":3,
+    "weights":"uniform"
+}
+DATA_TRANSFORMATION_OBJECT_FILE_NAME: str = "transformed_object.pkl"
